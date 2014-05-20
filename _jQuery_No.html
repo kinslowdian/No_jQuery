@@ -1,0 +1,250 @@
+<html lang="en">
+	
+	<head>
+		
+		<title>Changing An Element's CSS without jQuery</title>
+		
+		<style type="text/css">
+		
+			*
+			{
+				margin: 0;
+				padding: 0;
+				border: none;
+				outline: none;
+			}
+			
+			p
+			{
+				font-family: monospace;
+				display: inline-block;
+			}
+			
+			.classAdd
+			{
+				-webkit-transform-origin: 50% 50%;
+				transform-origin: 50% 50%;
+				
+				-webkit-animation: classAddFrames 2s ease-in-out infinite;
+				animation: classAddFrames 2s ease-in-out infinite;
+			}
+			
+			@-webkit-keyframes classAddFrames
+			{
+				0%		{-webkit-transform: scale(1);}
+				50%		{-webkit-transform: scale(0.6);}
+				100%	{-webkit-transform: scale(1);}	
+			}
+			
+			@keyframes classAddFrames
+			{
+				0%		{transform: scale(1);}
+				50%		{transform: scale(0.6);}
+				100%	{transform: scale(1);}				
+			}
+			
+			#memory
+			{
+				width: 0;
+				height: 0;
+				visibility: hidden;
+			}
+			
+			#saved
+			{
+				width: 200px;
+				height: 200px;
+				
+				-webkit-border-radius: 100px;
+				border-radius: 100px;
+				
+				background: lime;
+			}
+			
+			.basic
+			{
+				width: 200px;
+				height: 200px;
+				
+				-webkit-border-radius: 100px;
+				border-radius: 100px;
+				
+				background: lime;				
+			}
+			
+			.something
+			{
+				width: 200px;
+				height: 400px;
+				
+				-webkit-border-radius: 100px;
+				border-radius: 100px;
+				
+				background: yellow;
+			}
+			
+			#remove .something
+			{
+				background: brown;
+			}
+		
+		</style>
+		
+		<script type="text/javascript">
+		
+		var trace = function(str){ console.log(str); };
+		
+		var _style;
+		
+		var targ;
+		var targInner;
+		
+		var demo;
+		
+		var memory;
+		
+		function wait()
+		{
+			// jQuery ready();
+			document.addEventListener("DOMContentLoaded", init, false);
+		}
+		
+		function init(event)
+		{
+			document.removeEventListener("DOMContentLoaded", init, false);
+			
+			memory = document.getElementById("memory");
+			
+			targ = document.getElementById("stuff");
+			targInner = targ.getElementsByClassName("inner2");
+			
+			demo = setTimeout(runDemo, 1000);			
+		}
+		
+		function cssChange(target, cssObj)
+		{
+		   var css_string = "";
+		   
+		    for(var props in cssObj)
+		    {
+		        var f = props + ":" + cssObj[props] + "; ";
+		        css_string += f;
+		    }
+		    
+		    _style = document.createAttribute("style");
+		    _style.value = css_string;
+		    
+		    target[0].setAttributeNode(_style);
+		}
+		
+		function runDemo()
+		{
+		    var css =  {"color": "#ff0033", "font-size": "60px", "font-weight" : "bold"};
+			
+			cssChange(targInner[0].getElementsByTagName("p"), css);
+			
+			cssChange(targInner[0].getElementsByClassName("ok"), css);
+			
+			targInner[0].getElementsByClassName("ok")[0].classList.add("classAdd");
+			
+			// BASIC SELECTION
+			var manipulated = document.getElementById("empty");
+			
+			// RECORD HTML INSIDE A DIV ($(div).html())
+			document.getElementById("empty").innerHTML = memory.innerHTML;
+			
+			// EMPTY HTML FROM A DIV
+			document.getElementById("full").innerHTML = "";
+			
+			// ADD CLASS TO AN ELEMENT [0] used as we go deeper into selection
+			// SELECTS A CLASS INSIDE A DIV WITH AN ID
+			document.getElementById("empty").getElementsByTagName("div")[0].classList.add("classAdd"); 
+			
+			// REMOVE CLASS FROM ELEMENT
+			// SELECTS A CLASS INSIDE A DIV WITH AN ID
+			document.getElementById("remove").getElementsByClassName("something")[0].classList.remove("classAdd");
+			
+			alert(memory.innerHTML);
+			
+			for(var i = 0; i < 10; i++)
+			{
+				var el = document.createElement("div");
+				el.innerHTML = memory.innerHTML;
+				
+				el.getElementsByTagName("div")[0].setAttribute("id", "block" + i);
+				
+				document.getElementById("fill").innerHTML += el.innerHTML;
+				
+				// [0] not needed as selected further up
+				document.getElementById("block" + i).classList.add("classAdd");
+				
+				delete el;
+			}	
+			
+		}
+		
+		wait();			
+			
+		</script>
+		
+	</head>
+	
+	<body> <!-- onload="init(event);" -->
+	
+	<div id="wrapper">
+		
+		<div id="content">
+
+			<div id="stuff">
+			    
+			    <div class="inner0">
+			        
+			        <div class="inner1">
+			            
+			            <div class="inner2">
+			                
+			                <!-- <p class="ok">.inner2</p> -->
+			                
+			                <p>.inner2</p>
+			                <p class="ok">extra p tag</p>
+			            
+			            </div>
+			        
+			        </div>
+			    
+			    </div>
+			
+			</div>	<!-- #stuff -->
+			
+			<div id="empty"></div>
+			
+			<div id="full">
+					
+				<div class="something classAdd"></div>
+				
+			</div>
+			
+			<div id="remove">
+				
+				<div class="something classAdd"></div>
+				
+			</div>
+			
+			<div id="fill">
+			
+			</div>
+			
+			<div id="memory">
+				
+				<div id="saved" class="basic"></div>
+				
+			</div>
+			
+
+		</div> <!-- #content -->
+		
+	</div> <!-- #wrapper -->
+	
+	</body>
+	
+</html>
